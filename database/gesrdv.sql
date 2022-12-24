@@ -2,9 +2,9 @@
 -- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Dec 13, 2022 at 04:24 PM
--- Server version: 10.4.21-MariaDB
+-- Host: 127.0.0.1
+-- Generation Time: Jun 08, 2022 at 02:24 PM
+-- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `gesrdvv`
+-- Database: `gesrdv`
 --
 
 -- --------------------------------------------------------
@@ -51,6 +51,33 @@ INSERT INTO `catalogue` (`idcatalogue`, `lib`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `consultation`
+--
+
+CREATE TABLE `consultation` (
+  `idconsultation` int(11) NOT NULL,
+  `idpatient` int(11) NOT NULL,
+  `idmedecin` int(11) NOT NULL,
+  `pression` int(11) NOT NULL,
+  `poids` float NOT NULL,
+  `coeur` int(11) NOT NULL,
+  `idmedicament` int(11) NOT NULL,
+  `observation` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `consultation`
+--
+
+INSERT INTO `consultation` (`idconsultation`, `idpatient`, `idmedecin`, `pression`, `poids`, `coeur`, `idmedicament`, `observation`) VALUES
+(1, 1, 2, 11, 72, 69, 7, 'sick'),
+(2, 2, 1, 12, 60, 62, 1, 'drink water'),
+(3, 1, 1, 12, 72, 65, 28, 'br9 m3a r3d'),
+(4, 4, 1, 62, 72, 69, 5, 'chrb lma');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `medecin`
 --
 
@@ -60,11 +87,19 @@ CREATE TABLE `medecin` (
   `genre` varchar(255) DEFAULT NULL,
   `nom` varchar(255) DEFAULT NULL,
   `prenom` varchar(255) DEFAULT NULL,
-  `date_embauche` varchar(255) DEFAULT NULL,
-  `date_naissance` varchar(255) DEFAULT NULL,
+  `date_embauche` date DEFAULT NULL,
+  `date_naissance` date DEFAULT NULL,
   `addresse` varchar(255) DEFAULT NULL,
   `telephone` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `medecin`
+--
+
+INSERT INTO `medecin` (`idmedecin`, `idspecialite`, `genre`, `nom`, `prenom`, `date_embauche`, `date_naissance`, `addresse`, `telephone`) VALUES
+(1, 1, 'Homme', 'TOTO', 'grande', '2000-05-16', '2022-05-10', 'Dar', '0622678910'),
+(2, 7, 'Homme', 'Dolly', 'peane', '1999-09-15', '2022-05-02', 'B13', '0617801102');
 
 -- --------------------------------------------------------
 
@@ -133,6 +168,15 @@ CREATE TABLE `patient` (
   `cnss` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `patient`
+--
+
+INSERT INTO `patient` (`idpatient`, `genre`, `nom`, `prenom`, `cin`, `date_naissance`, `addresse`, `tel`, `profession`, `cnss`) VALUES
+(1, 'Homme', 'Nait', 'Ibrahim', 'EX123', '2001-10-26', 'Sidi Maarouf', '0622723040', 'Developer', 234),
+(2, 'Femme', 'Sea', 'EL', 'AS32', '1999-07-07', 'ANFA', '0606060710', 'Accountant', 789),
+(4, 'Homme', 'hasnaoui', 'oussama', 'be455', '2000-11-16', 'resistance', '0606061616', 'steward', 2632);
+
 -- --------------------------------------------------------
 
 --
@@ -146,6 +190,15 @@ CREATE TABLE `rdv` (
   `daterdv` date DEFAULT NULL,
   `heurerdv` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `rdv`
+--
+
+INSERT INTO `rdv` (`idrdv`, `idmedecin`, `idpatient`, `daterdv`, `heurerdv`) VALUES
+(1, 1, 4, '2022-05-24', '04:20'),
+(2, 1, 2, '2022-05-19', '09:00'),
+(3, 1, 4, '2022-05-24', '04:00');
 
 -- --------------------------------------------------------
 
@@ -181,15 +234,19 @@ CREATE TABLE `users` (
   `iduser` int(11) NOT NULL,
   `login` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `groupid` int(11) NOT NULL
+  `groupid` int(11) NOT NULL,
+  `idmed` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`iduser`, `login`, `password`, `groupid`) VALUES
-(1, 'Admin', 'azerty123', 0);
+INSERT INTO `users` (`iduser`, `login`, `password`, `groupid`, `idmed`) VALUES
+(5, 'Med', 'azerty123', 1, 1),
+(7, 'Admin', 'azerty123', 0, NULL),
+(8, 'Sec', 'azerty123', 2, NULL),
+(9, 'Med2', 'azerty123', 1, 2);
 
 --
 -- Indexes for dumped tables
@@ -200,6 +257,15 @@ INSERT INTO `users` (`iduser`, `login`, `password`, `groupid`) VALUES
 --
 ALTER TABLE `catalogue`
   ADD PRIMARY KEY (`idcatalogue`);
+
+--
+-- Indexes for table `consultation`
+--
+ALTER TABLE `consultation`
+  ADD PRIMARY KEY (`idconsultation`),
+  ADD KEY `fk_pat_obs` (`idpatient`),
+  ADD KEY `fk_med_obs` (`idmedicament`),
+  ADD KEY `fk_con` (`idmedecin`);
 
 --
 -- Indexes for table `medecin`
@@ -239,7 +305,8 @@ ALTER TABLE `specialite`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`iduser`);
+  ADD PRIMARY KEY (`iduser`),
+  ADD KEY `fk_medec` (`idmed`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -249,31 +316,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `catalogue`
 --
 ALTER TABLE `catalogue`
-  MODIFY `idcatalogue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `idcatalogue` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `consultation`
+--
+ALTER TABLE `consultation`
+  MODIFY `idconsultation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `medecin`
 --
 ALTER TABLE `medecin`
-  MODIFY `idmedecin` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idmedecin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `medicament`
 --
 ALTER TABLE `medicament`
-  MODIFY `idmedicament` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `idmedicament` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `patient`
 --
 ALTER TABLE `patient`
-  MODIFY `idpatient` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idpatient` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `rdv`
 --
 ALTER TABLE `rdv`
-  MODIFY `idrdv` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idrdv` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `specialite`
@@ -285,11 +358,19 @@ ALTER TABLE `specialite`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `consultation`
+--
+ALTER TABLE `consultation`
+  ADD CONSTRAINT `fk_con` FOREIGN KEY (`idmedecin`) REFERENCES `medecin` (`idmedecin`),
+  ADD CONSTRAINT `fk_med_obs` FOREIGN KEY (`idmedicament`) REFERENCES `medicament` (`idmedicament`),
+  ADD CONSTRAINT `fk_pat_obs` FOREIGN KEY (`idpatient`) REFERENCES `patient` (`idpatient`);
 
 --
 -- Constraints for table `medecin`
@@ -302,6 +383,12 @@ ALTER TABLE `medecin`
 --
 ALTER TABLE `medicament`
   ADD CONSTRAINT `fk_med` FOREIGN KEY (`idcatalogue`) REFERENCES `catalogue` (`idcatalogue`);
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_medec` FOREIGN KEY (`idmed`) REFERENCES `medecin` (`idmedecin`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
